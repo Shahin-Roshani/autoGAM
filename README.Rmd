@@ -13,9 +13,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-<style>
-body{font-family: times, serif}
-</style>
 
 # autoGAM
 
