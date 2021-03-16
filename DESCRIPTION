@@ -1,6 +1,6 @@
 Package: autoGAM
 Type: Package
-Title: Automatic fitiing of Generalized Additive Models
+Title: Automatic fitting of Generalized Additive Models
 Version: 0.1.0
 Author: Shahin Roshani <shahinroshani@ymail.com>
 Maintainer: Shahin Roshani <shahinroshani@ymail.com>
