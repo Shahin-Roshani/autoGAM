@@ -15,7 +15,6 @@ Depends:
     gam (>= 1.20),
     splines (>= 4.0.4),
     fastDummies (>= 1.6.3),
-    recipes (>= 0.1.15),
     car (>= 3.0-10)
 Suggests:
     knitr,

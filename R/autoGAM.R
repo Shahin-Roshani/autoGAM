@@ -1,7 +1,7 @@
 
 #' autoGAM
 #'
-#' @import tidyverse magrittr gam splines fastDummies recipes car
+#' @import tidyverse magrittr gam splines fastDummies car
 #'
 #' @description Automatic evaluation of different forms (functions) of predictors to obtain the best Generalized Additive Model (GAM).
 #'
