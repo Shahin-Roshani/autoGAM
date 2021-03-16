@@ -614,13 +614,11 @@ autoGAM <- function(resp,resp.base=NULL,
 
                   resp,cat_format)) -> results$`Best forms plot(s)`
 
+  final_formula <- str_c(resp,'~',str_c(final_preds,collapse='+')) %>%
 
+    as.formula
 
-  final_model <- glm(str_c(resp,'~',
-
-                           str_c(final_preds,collapse='+')) %>%
-
-                       as.formula,data=data,family=family)
+  final_model <- glm(final_formula,data=data,family=family)
 
   results$`Final GAM` <- final_model
 

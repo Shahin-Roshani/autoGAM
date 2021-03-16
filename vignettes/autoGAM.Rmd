@@ -2,7 +2,7 @@
 title: "autoGAM vignette"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{autoGAM}
+  %\VignetteIndexEntry{autoGAM vignette}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8} 
 ---
@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 
 ## Overview:
 
-In this vignette, we propose two different examples on well-known datasets and we try to cover all different aspects of arguments and outputs of this all-in-one function through them.
+In this vignette, two different examples on two different well-known datasets are proposed. The goal is to cover all different aspects of arguments and outputs of this all-in-one function through these examples.
 
 Basically, autoGAM:
 
@@ -132,7 +132,7 @@ You can see that %95 condidence interval was also drawn. You can change confiden
 
 **6- Final GAM:**
 
-Finally, last but not least, the fitted best GAM fitted with the final predictors:
+Finally, the best GAM fitted with the final obtained predictors:
 
 ```{r}
 carsGAM$`Final GAM`
@@ -203,7 +203,7 @@ As we expected, since backward argument was set to be FALSE, all obtained best f
 irisGAM$`Best forms plot(s)`
 ```
 
-One last thing! You saw that base category of the *Species* variable was chosen to be setosa. This is because by default the first category of the response will become the base. There's no difference in how the model is going to predict but one might want to change this base for the sake of interpretation. For example what if we wanted versicolor as the base category of the response? We can easily set base category of response ith resp.base argument.
+One last thing! You saw that base category of the *Species* variable was chosen to be setosa. This is because by default the first category of the response will become the base. There's no difference in how the model is going to predict but one might want to change this base for the sake of interpretation. For example what if we wanted versicolor as the base category of the response? We can easily set base category of response with resp.base argument.
 
 ```{r warning=FALSE,dpi=100,fig.align='center',fig.width=6.9,fig.height=4.5}
 irisGAM_new <- autoGAM(resp='Species',
