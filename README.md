@@ -20,9 +20,9 @@ install.packages('devtools') #If you haven't installed it yet!
 devtools::install_github('Shahin-Roshani/autoGAM')
 ```
 
-## Links for materials:
+## Link shortcuts:
 
-[Full information](https://shahin-roshani.github.io/autoGAM/)
+[Package website for autoGAM](https://shahin-roshani.github.io/autoGAM/)
 
 [Comprehensive
 vignette](https://shahin-roshani.github.io/autoGAM/articles/autoGAM.html)
