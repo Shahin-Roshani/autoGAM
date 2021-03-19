@@ -504,7 +504,7 @@ autoGAM <- function(resp,resp.base=NULL,
 
         row <- y %>% filter(.[[6]]==max(.[[6]]))
 
-        v[[j]] <- str_c(row %>% .$rowname,' [p-value = ',
+        v[[j]] <- str_c(row %>% .$rowname,' [',names(row)[6],' = ',
 
                         row %>% .[[6]] %>% round(.,4),']')
 
