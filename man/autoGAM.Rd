@@ -74,8 +74,7 @@ A comprehensive list containing information of the whole evaluation process, bac
 Automatic evaluation of different forms (functions) of predictors to obtain the best Generalized Additive Model (GAM).
 }
 \examples{
-autoGAM(resp='mpg',cont.vars=names(mtcars)[3:6],cat.vars=names(mtcars)[8],
-data=mtcars,forms.plot=TRUE)
+autoGAM(resp='mpg',cont.vars=names(mtcars)[3:6],cat.vars='vs',data=mtcars,forms.plot=TRUE)
 
 }
 \author{

@@ -41,8 +41,7 @@
 #'
 #' @author Shahin Roshani
 #'
-#' @examples autoGAM(resp='mpg',cont.vars=names(mtcars)[3:6],cat.vars=names(mtcars)[8],
-#' data=mtcars,forms.plot=TRUE)
+#' @examples autoGAM(resp='mpg',cont.vars=names(mtcars)[3:6],cat.vars='vs',data=mtcars,forms.plot=TRUE)
 #'
 #' @export
 
