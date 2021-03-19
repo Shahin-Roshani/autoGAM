@@ -478,7 +478,9 @@ autoGAM <- function(resp,resp.base=NULL,
 
   if (backward){
 
-    backward <- function(resp,preds,data,family=family,
+    backward <- function(resp,preds,data,
+
+                         family=family,
 
                          test=backward.test,
 
@@ -500,9 +502,11 @@ autoGAM <- function(resp,resp.base=NULL,
 
         i <- i + 1 ; j <- j + 1
 
-        v[[j]] <- y %>% filter(.[[6]]==max(.[[6]])) %>%
+        row <- y %>% filter(.[[6]]==max(.[[6]]))
 
-          .$rowname
+        v[[j]] <- str_c(row %>% .$rowname,' [p-value = ',
+
+                        row %>% .[[6]] %>% round(.,4),']')
 
         y %<>% filter(.[[6]]!=max(.[[6]])) %>% .$rowname
 
