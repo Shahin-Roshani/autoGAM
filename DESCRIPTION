@@ -1,10 +1,10 @@
 Package: autoGAM
 Type: Package
 Title: Automatic fitting of Generalized Additive Models
-Version: 0.1.0
+Version: 1.0.0
 Author: Shahin Roshani <shahinroshani@ymail.com>
 Maintainer: Shahin Roshani <shahinroshani@ymail.com>
-Description: This package and its all-in-one function autoGAM, evalutes different forms of continuous predictors to include in an additive model and then obtains the best Generalized Additive Model.
+Description: This package evalutes different forms of continuous predictors to include in an additive model to obtain the best Generalized Additive Model by using workflow based procedures.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -16,6 +16,10 @@ Depends:
     splines (>= 4.0.4),
     fastDummies (>= 1.6.3),
     car (>= 3.0-10)
+Imports:
+    future (>= 1.21.0),
+    furrr (>= 0.2.2),
+    AICcmodavg (>= 2.3-1)
 Suggests:
     knitr,
     rmarkdown

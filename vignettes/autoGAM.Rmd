@@ -8,7 +8,7 @@ vignette: >
 ---
 
 <style>
-body{text-align: justify ; font-family: times, serif}
+body{text-align: justify}
 </style>
 
 
@@ -19,47 +19,47 @@ knitr::opts_chunk$set(
 )
 ```
 
-## Overview:
+## Overview
 
-In this vignette, two different examples on two different well-known datasets are proposed. The goal is to cover all different aspects of arguments and outputs of this all-in-one function through these examples.
+In this vignette, two different examples on two different well-known datasets are proposed. The goal is to cover all different aspects of workflow based procedures included this package through these examples.
 
-Basically, autoGAM:
+Basically, autoGAM has 4 functions that communicate with each other to create a workflow with the aim of evaluating different user-specified forms of included continuous predictors and find the best Generalized Additive Model (GAM). These functions are:
 
-**1-** Evaluates user's specified form(s) on continuous predictor(s) and obtains the best form (among pre-specified form(s)) for each continuous predictor based on AIC values of GLM fits.
+**1- autoGAM_frame:** The base of all other procedures! Evaluates user's specified form(s) on continuous predictor(s) and obtains the best form (among pre-specified form(s)) for each continuous predictor based on the chosen metric (AIC, AICc or BIC) values of GLM fits. This function creates the base platform for creating the final GAM adn the remaining functions are modifiers of this base platform.
 
-*Note: User can specify whether outliers should be ignored in fitting each form on predictor(s) or not. outliers in case of response are detected by car::outlierTest which is based on studentized residuals of records and outliers in case of the predictor are determined as records that have hat-values > 2p (where p is the number of parameters inside the model). If user decides to ignore outliers in evaluation process, ignore.outliers argument can be set to TRUE but when one is not sure about the presence of outliers, it's highly recommended to leave the default value which is FALSE to obtain more accurate results.*
+*Note: User can specify whether outliers should be ignored in fitting each form on predictor(s) or not. outliers in case of response are detected by ```car::outlierTest()``` which is based on studentized residuals of records and outliers in case of the predictor are determined as records that have hat-values > 2p (where p is the number of parameters inside the model). If user decides to ignore outliers in evaluation process, ```ignore.outliers``` argument can be set to ```TRUE``` but when one is not sure about the presence of outliers, it's highly recommended to leave the default value which is ```FALSE``` to obtain more accurate results.*
 
-**2-** Creates an additive GLM fit with the obtained best forms of continuous predictor(s) and the categorical variable(s) (if there are any!).
+**2- backward_select:** An independent function for performing p-value based backward elimination process that also modified to simply be used on returns of class ```autoGAM_frame```.
 
-**3-** Performs backward elimination process on the additive model of the phase 2 and outputs the final GAM model unless user decides not to perform backward elimination process by changing the default value of backward argument from TRUE to FALSE where the additive model of the phase 2 becomes the final GAM model.
+**3- autoGAM_fit:** A wrapper function that obtains and adds the final and best GAM to the platform.
 
-After the mentioned steps, autoGAM will provide a comprehensive list of information and plots of the whole process and the final result.
+**4- plot:** Plot method for returns of ```autoGAM_frame``` to automatically create plots of the evaluated forms of continuous predictors and plots related to the best forms of predictors. 
+
+All the mentioned procedures can be used almost back and forth but user must remember that ```autoGAM_frame()``` is the base that creates the base platform and other functions can be used on it in different orders.
 
 ```{r setup}
 library(autoGAM)
 ```
 
-## Example on mtcars data:
+## Example on mtcars data
 
 For the first example, we use mtcars dataset. We want to evaluate *x*, *log(x)* with 1 & 3 as its base, *logb(x)*, *power(x)* with degrees 3 & 4, *poly(x)* (polynomial form) with degrees 3 & 4, *ns(x)* (natural cubic spline form) with 3 degrees of freedom and *cut(x)* with 3 & 4 partitions as our desired forms on *disp*, *hp*, *drat* & *wt* as our chosen continuous variables and then we want to obtain the best GAM made out of the obtained best forms of mentioned continuous variables and *vs* as our only desired categorical variable:
 
 ```{r}
-carsGAM <- autoGAM(resp = 'mpg',
-                    
-                   cont.vars = names(mtcars)[3:6],
-                    
-                   cat.vars = 'vs',
+my_mtcars <- mtcars %>% mutate_at('vs',as.factor)
+
+(cars_frame <- autoGAM_frame(formula = mpg~disp+hp+drat+wt+vs,
                     
                    forms = list('identity'=c(),'log'=c(1,3),'logb',
                                 
                                 'power'=3:4,'poly'=3:4,'ns'=3,'cut'=3:4),
                    
-                   data = mtcars,
-                   
-                   forms.plot = T)
+                   data = my_mtcars))
 ```
 
-*Note: As we can see, autoGAM automatically removes any function (form) that creates NaN, Inf or -Inf on specific predictors and gives out a Warning message on which forms of predictor(s) were removed.*
+Best forms of continuous predictors and final predictors to be used in the final GAM are the default print outputs but they are part of a bigger list. Try exploring this list by calling different parts of it by ```cars_frame$```.
+
+*Note: As we can see, autoGAM automatically removes any function (form) that creates ```NaN```, ```Inf``` or ```-Inf``` on specific predictors and gives out a Warning message on which forms of predictor(s) were removed.*
 
 All the included functions in the forms list has the form: *f(x)* or *f(x,degree)* and they all output a vector or a matrix (As they should!). All of these functions are well known functions from base R or familiar packages (that are included as dependencies of autoGAM) including: *identity, log2, logb, log, exp, poly, bs & ns (from splines package), s (from gam package) & cut*. Only *power* function is an exception which is a pre-defined function inside autoGAM. *power(x,degree)* is simply x\^degree.
 
@@ -69,91 +69,68 @@ All the included functions in the forms list has the form: *f(x)* or *f(x,degree
 
 *Note: If a hypothetical function g has the form g(x,degree) and you pass it singularly in the forms list ('g' or 'g'=c()), default value for degree in g(x,degree) will be used, otherwise if there is no default value for degree, you will get an error until you determine degree value(s) by passing them in front of 'g' name in the forms list.*
 
-We also want to see all the information obtained in the evaluation process together as a plot so forms.plot=T was also set.
-
-Now we examine each part of the final result:
-
-**1- Forms data:**
+Now that we have our base platform and the best forms of our included continuous predictors, it's time to fit the best GAM. it can't be any simpler! just call ```autoGAM_fit()``` on the created frame:
 
 ```{r}
-carsGAM$`Forms data`
+(cars_fit <- autoGAM_fit(cars_frame))
 ```
 
-The given comprehensive data frame gives out information about the whole evaluation process on continuous predictors. Under the data column, nested information of predictions and their confidence intervals for its respected form in the form column can be found.
+Simple as that. Again this is the print output of ```autoGAM_fit()```. Actually the fitted model object was added to the base list created by ```autoGAM_frame()```. You can still explore everything by using ```cars_fit$```. For example let's extract the fitted model object that was added and we saw its summary:
 
-**2- Forms plot(s):**
+```{r}
+cars_fit$`final fit`
+```
+
+As you saw, we first created the base platform and evaluated our desired forms of continuous predictors in it and then fitted the GAM by using the best forms of continuous predictors and our one categorical predictor. What if we wanted all the insignificant predictors in the last outpur gone? Again it can't be any easier. Just call ```backward_select()``` function on the base platform then fit the final GAM by ```autoGAM_fit()```.
+
+```{r}
+(cars_backward_fit <- cars_frame %>% 
+   
+   backward_select(backward.alpha=.1,backward.test='Rao') %>% 
+   
+   autoGAM_fit)
+```
+
+From the output we can see that backward elimination was done. The sequential details of this backward process were also added to the list from autoGAM_frame. let's check it out:
+
+```{r}
+cars_backward_fit$`backward info`
+```
+
+Now nothing gathers up information in one place better than a good plot. plot method for ```autoGAM_frame``` was designed to create plots related to evaluation of different forms of continuous predictors and to create final forms of included continuous predictors.
+
+*Note that plot can be called on any object with the ```autoGAM_frame``` base.*
 
 ```{r,dpi=100,fig.align='center',fig.width=6.9,fig.height=4.5}
-carsGAM$`Forms plot(s)`
+plot(cars_frame,type='forms')
 ```
 
-As you can see, the more forms and predictors involved, the more crowded the 'Forms plot(s)' can get. That's why the default value of forms.plot argument was set to FALSE and it's up to the user to decide whether this plot should be included in the results or not.
+The plot above was a bit crowded, wasn't it? It's always good to see a formal plot for final best form of each continuous predictor that was included in the final GAM.
 
-*Remember you can always create your own modified plots by using the the information in the data frame of Forms data in part 1.*
+Based on full model:
 
-**3- Backward info:**
-
-```{r}
-carsGAM$`Backward info`
+```{r,dpi=100,fig.align='center',fig.width=6.9,fig.height=5.1}
+plot(cars_fit,type='final')
 ```
 
-Here we can see from step0 that *poly(disp,3), cut(drat,4), cut(hp,4) & poly(wt,4)* were found to be the best forms of their related predictors. These forms plus *vs* as the only desired categorical variable were used in step0 to create the base additive model then since backward argument was left to be TRUE, backward elimination process with elimination alpha = 0.05 was performed (you can change this default value from backward.alpha argument) and:
+Based on reduced model after backward elimination process:
 
-In step1: *cut(drat,4)* was removed (*p-value=0.906*),
-
-In step2: *vs* was removed (*p-value=0.506*),
-
-In step3: *poly(wt,4)* was removed (*p-value=0.566*).
-
-So the final best GAM came out to be formed by *poly(disp,3)* & *cut(hp,4)* after the backward elimination process.
-
-**4- Final predictors:**
-
-```{r}
-carsGAM$`Final predictors`
-```
-
-As we expected! Final predictors to be used in the best GAM are those in the final step of the backward elimination process.
-
-*Of course if we've set argument backward=FALSE, we would have received all the predictors that was mentioned in the step0 of the backward elimination process.*
-
-**5- Best forms plot(s):**
-
-The plot in 'Forms plot(s)' was a bit crowded, wasn't it? It's always good to see a formal plot for final best form of each continuous predictor that was included in the final GAM: 
-
-```{r,dpi=100,fig.align='center',fig.width=6.9,fig.height=3.6}
-carsGAM$`Best forms plot(s)`
-```
-
-
-You can see that %95 condidence interval was also drawn. You can change confidence level by setting interval.alpha argument (default=0.05) for yourself to change how wide this interval should be.
-
-*Again, remember you can create your own modified plot(s) by using the comprehensive dataset in 'Forms data' part of result.*
-
-**6- Final GAM:**
-
-Finally, the best GAM fitted with the final obtained predictors:
-
-```{r}
-carsGAM$`Final GAM`
-```
-
-```{r}
-carsGAM$`Final GAM` %>% summary
+```{r,dpi=100,fig.align='center',fig.width=6.9,fig.height=3.4}
+plot(cars_backward_fit,type='final')
 ```
 
 Now that we have the general idea about how autoGAM works, it's time to wrap everything up by mentioning final details in the form of an example.
 
-## Example on iris data:
+## Example on iris data
 
 This time we are interested in evaluation of two completely random functions that one of them has a vector output and the other one has a matrix output.
 
 We first perform some modifications on iris data and then we introduce our desired functions:
 
 ```{r}
-(dat <- iris %>% filter(Species %in% unique(Species)[1:2]) %>%
-  
-  as_tibble %>% mutate_at('Species',as.character))
+(my_iris <- iris %>% filter(Species %in% unique(Species)[1:2]) %>%
+   
+   as_tibble %>% mutate_at('Species',as.character))
 ```
 
 We filtered iris to only have the information of *setosa & versicolor Species*. So our version of iris (dat) has all numerical predictors and a categorical response with 2 levels (*Species*).
@@ -169,55 +146,55 @@ temp_mat <- function(x,d) as.list((1:d)*-1) %>% map(~x^.) %>% reduce(cbind)
 Both of these specified functions have *f(x)* or *f(x,degree)* form and their outputs are either a vector or a matrix so they can be used in the list of forms argument.
 
 ```{r warning=FALSE}
-irisGAM <- autoGAM(resp='Species',
-        
-                   data=dat,
-        
-                   forms=list('temp_vec','temp_mat'=1:3),
-        
-                   family=binomial(link='logit'),
-        
-                   forms.plot=T,
-        
-                   backward=F)
+iris_fit <- autoGAM_frame(formula=Species~.,
+                          
+                          data=my_iris,
+                          
+                          forms=list('temp_vec','temp_mat'=1:3),
+                          
+                          family=binomial(link='logit'),
+                          
+                          metric='AICc',
+                          
+                          parallel=T) %>% autoGAM_fit
 
 ```
-
-Did you notice? Arguments cont.vars & cat.vars were not specified! When **both** of these arguments are empty, autoGAM automatically detects them from the dataset given in the data argument.
-
-*Note: Remember that this automatic detection only happens when both of the cont.vars & cat.vars arguments are empty. Keep in mind to only leave them empty if your dataset only consists of your response and desired predictors with right types (numerical, character or factor).*
-
-Since we created *dat* to only have the response and our desired predictors with correct types, we could leave cont.vars & cat.vars empty. Also this time we've set backward=FALSE since we don't want to perform backward elimination so best forms of all included predictors will be included in the final GAM.
 
 ```{r,dpi=100,fig.align='center',fig.width=6.9,fig.height=4.5}
-irisGAM$`Forms plot(s)`
-```
-
-```{r}
-irisGAM$`Final predictors`
-```
-
-As we expected, since backward argument was set to be FALSE, all obtained best forms of predictors were included. Of course if there was any categorical variable included, it would have been included near the obtained best forms.
-
-```{r,dpi=100,fig.align='center',fig.width=6.9,fig.height=4.5}
-irisGAM$`Best forms plot(s)`
+plot(iris_fit,type='forms')
 ```
 
 One last thing! You saw that base category of the *Species* variable was chosen to be setosa. This is because by default the first category of the response will become the base. There's no difference in how the model is going to predict but one might want to change this base for the sake of interpretation. For example what if we wanted versicolor as the base category of the response? We can easily set base category of response with resp.base argument.
 
 ```{r warning=FALSE,dpi=100,fig.align='center',fig.width=6.9,fig.height=4.5}
-irisGAM_new <- autoGAM(resp='Species',
-                       
-                       resp.base='versicolor',
-                       
-                       data=dat,
-                       
-                       forms=list('temp_vec','temp_mat'=1:3),
-                       
-                       family=binomial(link='logit'),
-                       
-                       backward=F)
+iris_frame <- autoGAM_frame(formula=Species~.,
+                          
+                            data=my_iris,
+                          
+                            forms=list('temp_vec','temp_mat'=1:3),
+                          
+                            family=binomial(link='logit'),
+                          
+                            metric='AICc',
+                          
+                            parallel=T,
+                          
+                            resp.base='versicolor')
 
-irisGAM_new$`Best forms plot(s)`
+plot(iris_frame,type='forms')
+
+plot(iris_frame)
 ```
 
+## backward_select() as a separate function
+
+From update (1.0.0) that came with total rebuild of the package's structure, ```backward_select()``` became an independent function so it can act as a function on ```autoGAM_frame``` objects to match the new workflow based structure.
+A valuable side effect of this independence is that this function can also act as an independent function for only backward selection procedures based on formula inputs.
+In technical form, ```object``` argument can be both a formula or an object of class ```autoGAM_frame``` to participate in autoGAM's workflow.
+The usage is pretty easy and straightforward but let's check out an example:
+
+```{r}
+backward_select(object=mpg~hp+poly(disp,2)+cut(drat,3)+vs,data=my_mtcars)
+```
+
+The detailed information of the sequential backward elimination process will be returned directly. When ```object``` is an object of class ```autoGAM_frame``` instead of a formula, the above list will be added to the final frame list as we saw earlier.
