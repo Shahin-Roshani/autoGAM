@@ -44,7 +44,6 @@
 #'
 #' @export
 
-
 autoGAM_frame <- function(formula,
 
                           resp.base=NULL,
@@ -183,40 +182,70 @@ autoGAM_frame <- function(formula,
 
                 family,ignore.outliers){
 
-    base_fit <- glm(str_c(resp,'~my_x') %>% as.formula,
 
-                    data=data %>% mutate(my_x=my_x) %>%
+    safe_glm <- possibly(.f=function(...){glm(...)},otherwise=NA)
 
-                      (function(x){
 
-                        row.names(x) <- NULL
+    base_fit <- safe_glm(str_c(resp,'~my_x') %>% as.formula,
 
-                        return(x)
+                         data=data %>% mutate(my_x=my_x) %>%
 
-                      }),family=family)
+                           (function(x){
+
+                             row.names(x) <- NULL
+
+                             return(x)
+
+                           }),family=family)
 
     dat <- data %>% mutate(my_x=my_x)
 
-    fits_mat <- predict(base_fit,se.fit=T,type='response') %>%
+    if (!is.na(base_fit[1])){
 
-      as.data.frame %>% select(1:2) %>%
+      fits_mat <- predict(base_fit,se.fit=T,type='response') %>%
 
-      rename_at(1,function(x) 'yhat') %>%
+        as.data.frame %>% select(1:2) %>%
 
-      mutate(yhat_lwr=yhat-qnorm(1-interval.alpha/2)*se.fit,
+        rename_at(1,function(x) 'yhat') %>%
 
-             yhat_upr=yhat+qnorm(1-interval.alpha/2)*se.fit)
+        mutate(yhat_lwr=yhat-qnorm(1-interval.alpha/2)*se.fit,
+
+               yhat_upr=yhat+qnorm(1-interval.alpha/2)*se.fit)
+
+    } else{
+
+      fits_mat <- matrix(NA,nrow(dat),4) %>% as.data.frame %>%
+
+        (function(x){
+
+          names(x) <- c('yhat','se.fit','yhat_lwr','yhat_upr')
+
+          return(x)
+
+        })
+
+    }
 
 
     metric_fun <- function(fit,metric){
 
-      if (metric=='AICc'){
+      if (is.na(fit[1])){
 
-        metric <- 'AICcmodavg::AICc'
+        r <- NA
+
+      } else{
+
+        if (metric=='AICc'){
+
+          metric <- 'AICcmodavg::AICc'
+
+        }
+
+        r <- do.call(eval(parse(text=metric)),list(fit))
 
       }
 
-      return(do.call(eval(parse(text=metric)),list(fit)))
+      return(r)
 
     }
 
@@ -265,17 +294,43 @@ autoGAM_frame <- function(formula,
 
       dat %<>% slice(-outs)
 
-      fits_mat <- predict(update(base_fit,data=dat),se.fit=T,
+      base_fit <- safe_glm(str_c(resp,'~my_x') %>% as.formula,
 
-                          type='response') %>%
+                           data=dat %>% mutate(my_x=my_x) %>%
 
-        as.data.frame %>% select(1:2) %>%
+                             (function(x){
 
-        rename_at(1,function(x) 'yhat') %>%
+                               row.names(x) <- NULL
 
-        mutate(yhat_lwr=yhat-qnorm(1-interval.alpha/2)*se.fit,
+                               return(x)
 
-               yhat_upr=yhat+qnorm(1-interval.alpha/2)*se.fit)
+                             }),family=family)
+
+      if (!is.na(base_fit[1])){
+
+        fits_mat <- predict(base_fit,se.fit=T,type='response') %>%
+
+          as.data.frame %>% select(1:2) %>%
+
+          rename_at(1,function(x) 'yhat') %>%
+
+          mutate(yhat_lwr=yhat-qnorm(1-interval.alpha/2)*se.fit,
+
+                 yhat_upr=yhat+qnorm(1-interval.alpha/2)*se.fit)
+
+      } else{
+
+        fits_mat <- matrix(NA,nrow(dat),4) %>% as.data.frame %>%
+
+          (function(x){
+
+            names(x) <- c('yhat','se.fit','yhat_lwr','yhat_upr')
+
+            return(x)
+
+          })
+
+      }
 
       res <- tibble(x=dat[[var_name]],
 
@@ -287,7 +342,7 @@ autoGAM_frame <- function(formula,
 
                form=label,
 
-               metric=metric_fun(update(base_fit,data=dat),metric))
+               metric=metric_fun(base_fit,metric))
 
     }
 
@@ -452,6 +507,25 @@ autoGAM_frame <- function(formula,
   }
 
   end <- Sys.time()
+
+  if (all(is.na(info$metric)==T)){
+
+    stop('Included form(s) cannot be fitted with the given settings!',call.=F)
+
+  }
+
+
+  if (any(is.na(info$metric)==T)){
+
+    glm_removals <- info %>% filter(is.na(metric)) %>% .$form %>%
+
+      str_c(.,collapse=', ')
+
+    warning(str_c('autoGAM removed ',glm_removals,' due to the inability of fitting!'),call.=F)
+
+    info %<>% filter(!is.na(metric))
+
+  }
 
 
   cat('\nForms evaluation was done in:',(end-start) %>% as.character.POSIXt %>% str_c(.,'.\n\n'))

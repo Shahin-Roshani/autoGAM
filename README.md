@@ -4,6 +4,7 @@
 # autoGAM
 
 <!-- badges: start -->
+
 [![CodeFactor](https://www.codefactor.io/repository/github/Shahin-Roshani/autoGAM/badge)](https://www.codefactor.io/repository/github/Shahin-Roshani/autoGAM)
 [![](https://codecov.io/gh/Shahin-Roshani/autoGAM/branch/master/graph/badge.svg)](https://codecov.io/gh/Shahin-Roshani/autoGAM)
 
@@ -22,7 +23,7 @@ by using workflow based procedures.
 
 ## Installation
 
-You can install the released version of autoGAM (Version: 1.0.0) from
+You can install the released version of autoGAM (Version: 1.0.1) from
 [github](https://github.com/) with:
 
 ``` r

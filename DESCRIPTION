@@ -1,7 +1,7 @@
 Package: autoGAM
 Type: Package
 Title: Automatic fitting of Generalized Additive Models
-Version: 1.0.0
+Version: 1.0.1
 Author: Shahin Roshani <shahinroshani@ymail.com>
 Maintainer: Shahin Roshani <shahinroshani@ymail.com>
 Description: This package evalutes different forms of continuous predictors to include in an additive model to obtain the best Generalized Additive Model by using workflow based procedures.

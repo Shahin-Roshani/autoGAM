@@ -31,7 +31,7 @@ The goal of autoGAM is to automate the evaluation process of different forms of 
 
 ## Installation
 
-You can install the released version of autoGAM (Version: 1.0.0) from [github](https://github.com/) with:
+You can install the released version of autoGAM (Version: 1.0.1) from [github](https://github.com/) with:
 
 ``` r
 install.packages('devtools') #If you haven't installed it yet!
