@@ -136,11 +136,10 @@ backward_select <- function(object,
     }
 
 
-    deparsed_formula <- deparse(object) %>% str_split('\\~') %>% .[[1]] %>%
+    resp <- attr(terms(object,data=data),which='variables')[[2]] %>%
 
-      str_remove_all(' ')
+      deparse(width.cutoff=500)
 
-    resp <- deparsed_formula[1]
 
     if (str_detect(resp,'(\\+|\\*|\\/|\\-)') | resp==''){
 
@@ -148,13 +147,8 @@ backward_select <- function(object,
 
     }
 
-    preds <- deparsed_formula[2] %>% str_split('\\+') %>% .[[1]]
 
-    if (length(preds)==1 && preds=='.'){
-
-      preds <- data %>% select(-any_of(resp)) %>% names
-
-    }
+    preds <- attr(terms(object,data=data),which='term.labels')
 
 
     res <- backward(resp,preds,data,family,backward.test,backward.alpha)

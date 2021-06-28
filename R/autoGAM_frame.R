@@ -44,6 +44,7 @@
 #'
 #' @export
 
+
 autoGAM_frame <- function(formula,
 
                           resp.base=NULL,
@@ -88,11 +89,11 @@ autoGAM_frame <- function(formula,
 
   }
 
-  deparsed_formula <- deparse(formula) %>% str_split('\\~') %>% .[[1]] %>%
 
-    str_remove_all(' ')
+  resp <- attr(terms(formula,data=data),which='variables')[[2]] %>%
 
-  resp <- deparsed_formula[1]
+    deparse(width.cutoff=500)
+
 
   if (str_detect(resp,'(\\+|\\*|\\/|\\-)') | resp==''){
 
@@ -100,13 +101,8 @@ autoGAM_frame <- function(formula,
 
   }
 
-  preds <- deparsed_formula[2] %>% str_split('\\+') %>% .[[1]]
 
-  if (length(preds)==1 && preds=='.'){
-
-    preds <- data %>% select(-any_of(resp)) %>% names
-
-  }
+  preds <- attr(terms(formula,data=data),which='term.labels')
 
 
   preds_data <- data %>% select(-any_of(resp)) %>% select(all_of(preds))
