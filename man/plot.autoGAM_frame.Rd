@@ -4,12 +4,14 @@
 \alias{plot.autoGAM_frame}
 \title{plot.autoGAM_frame}
 \usage{
-\method{plot}{autoGAM_frame}(object, type = "final")
+\method{plot}{autoGAM_frame}(x, type = "final", ...)
 }
 \arguments{
-\item{object}{An object of class \code{autoGAM_frame}.}
+\item{x}{An object of class \code{autoGAM_frame}.}
 
-\item{type}{The type of the plot to be created. Valid inputs are \code{'forms'} that returns the whole plots of evaluated continuous predictors & \code{'final'} that returns the plots related to the best forms obtained from the evaluation process.}
+\item{type}{The type of the plot to be created. Valid inputs are \code{'forms'} that returns the whole plots of evaluated continuous predictors & \code{'final'} (default value) that returns the plots related to the best forms obtained from the evaluation process.}
+
+\item{...}{Other plot arguments (Not being used for objects of class \code{'forms'}).}
 }
 \value{
 Desired plots that were requested by the \code{type} argument.

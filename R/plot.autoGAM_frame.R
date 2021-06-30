@@ -5,8 +5,9 @@
 #'
 #' @description Plot method for an object of class \code{autoGAM_frame}.
 #'
-#' @param object An object of class \code{autoGAM_frame}.
-#' @param type The type of the plot to be created. Valid inputs are \code{'forms'} that returns the whole plots of evaluated continuous predictors & \code{'final'} that returns the plots related to the best forms obtained from the evaluation process.
+#' @param x An object of class \code{autoGAM_frame}.
+#' @param type The type of the plot to be created. Valid inputs are \code{'forms'} that returns the whole plots of evaluated continuous predictors & \code{'final'} (default value) that returns the plots related to the best forms obtained from the evaluation process.
+#' @param ... Other plot arguments (Not being used for objects of class \code{'forms'}).
 #'
 #' @return Desired plots that were requested by the \code{type} argument.
 #'
@@ -28,7 +29,7 @@
 #'
 #' @export
 
-plot.autoGAM_frame <- function(object,type='final'){
+plot.autoGAM_frame <- function(x,type='final',...){
 
 
   if (!(type %in% c('forms','final'))){
@@ -37,6 +38,7 @@ plot.autoGAM_frame <- function(object,type='final'){
 
   }
 
+  object <- x
 
   info <- object$`forms info`
 
