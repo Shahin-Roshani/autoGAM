@@ -7,7 +7,7 @@
 #'
 #' @param x An object of class \code{autoGAM_frame}.
 #' @param type The type of the plot to be created. Valid inputs are \code{'forms'} that returns the whole plots of evaluated continuous predictors & \code{'final'} (default value) that returns the plots related to the best forms obtained from the evaluation process.
-#' @param ... Other plot arguments (Not being used for objects of class \code{'forms'}).
+#' @param ... Other plot arguments (Not being used for objects of class \code{'autoGAM_frame'}).
 #'
 #' @return Desired plots that were requested by the \code{type} argument.
 #'

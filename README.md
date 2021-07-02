@@ -4,6 +4,7 @@
 # autoGAM
 
 <!-- badges: start -->
+
 [![R-CMD-check](https://github.com/Shahin-Roshani/autoGAM/workflows/R-CMD-check/badge.svg)](https://github.com/Shahin-Roshani/autoGAM/actions)
 
 [![CodeFactor](https://www.codefactor.io/repository/github/Shahin-Roshani/autoGAM/badge)](https://www.codefactor.io/repository/github/Shahin-Roshani/autoGAM)
@@ -24,7 +25,7 @@ by using workflow based procedures.
 
 ## Installation
 
-You can install the released version of autoGAM (Version: 1.0.1) from
+You can install the released version of autoGAM from
 [github](https://github.com/) with:
 
 ``` r

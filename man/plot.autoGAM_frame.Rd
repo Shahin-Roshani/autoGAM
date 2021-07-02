@@ -11,7 +11,7 @@
 
 \item{type}{The type of the plot to be created. Valid inputs are \code{'forms'} that returns the whole plots of evaluated continuous predictors & \code{'final'} (default value) that returns the plots related to the best forms obtained from the evaluation process.}
 
-\item{...}{Other plot arguments (Not being used for objects of class \code{'forms'}).}
+\item{...}{Other plot arguments (Not being used for objects of class \code{'autoGAM_frame'}).}
 }
 \value{
 Desired plots that were requested by the \code{type} argument.
